@@ -4,6 +4,7 @@ namespace Laravel\Tinker\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Env;
+use Illuminate\Support\Facades\Log;
 use Laravel\Tinker\ClassAliasAutoloader;
 use Psy\Configuration;
 use Psy\Shell;
@@ -47,6 +48,8 @@ class TinkerCommand extends Command
 
         $config = Configuration::fromInput($this->input);
         $config->setUpdateCheck(Checker::NEVER);
+
+        $config->setLogging(Log::getLogger());
 
         $config->getPresenter()->addCasters(
             $this->getCasters()
