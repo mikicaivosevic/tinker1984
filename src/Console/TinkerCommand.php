@@ -4,15 +4,15 @@ namespace Abstractrs\Tinker1984\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Env;
-use Laravel\Tinker\ClassAliasAutoloader;
-use Laravel\Tinker\Models\Tinker1984Command;
+use Abstractrs\Tinker1984\ClassAliasAutoloader;
+use Abstractrs\Tinker1984\Models\Tinker1984Command;
 use Psy\Configuration;
 use Psy\Shell;
 use Psy\VersionUpdater\Checker;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-use Laravel\Tinker\Models\Tinker1984Session;
-use Laravel\Tinker\Models\Tinker1984User;
+use Abstractrs\Tinker1984\Models\Tinker1984Session;
+use Abstractrs\Tinker1984\Models\Tinker1984User;
 
 class TinkerCommand extends Command
 {
