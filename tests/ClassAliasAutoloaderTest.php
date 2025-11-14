@@ -1,8 +1,8 @@
 <?php
 
-namespace Laravel\Tinker\Tests;
+namespace Abstractrs\Tinker1984\Tests;
 
-use Laravel\Tinker\ClassAliasAutoloader;
+use Abstractrs\Tinker1984\ClassAliasAutoloader;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Psy\Shell;
@@ -14,7 +14,8 @@ class ClassAliasAutoloaderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->classmapPath = __DIR__.'/fixtures/vendor/composer/autoload_classmap.php';
+        $this->classmapPath =
+            __DIR__ . "/fixtures/vendor/composer/autoload_classmap.php";
     }
 
     protected function tearDown(): void
@@ -26,15 +27,18 @@ class ClassAliasAutoloaderTest extends TestCase
     {
         $this->loader = ClassAliasAutoloader::register(
             $shell = Mockery::mock(Shell::class),
-            $this->classmapPath
+            $this->classmapPath,
         );
 
-        $shell->shouldReceive('writeStdout')
-            ->with("[!] Aliasing 'Bar' to 'App\Foo\Bar' for this Tinker session.\n")
+        $shell
+            ->shouldReceive("writeStdout")
+            ->with(
+                "[!] Aliasing 'Bar' to 'App\Foo\Bar' for this Tinker session.\n",
+            )
             ->once();
 
-        $this->assertTrue(class_exists('Bar'));
-        $this->assertInstanceOf(\App\Foo\Bar::class, new \Bar);
+        $this->assertTrue(class_exists("Bar"));
+        $this->assertInstanceOf(\App\Foo\Bar::class, new \Bar());
     }
 
     public function testCanExcludeNamespacesFromAliasing()
@@ -43,24 +47,24 @@ class ClassAliasAutoloaderTest extends TestCase
             $shell = Mockery::mock(Shell::class),
             $this->classmapPath,
             [],
-            ['App\Baz']
+            ["App\Baz"],
         );
 
-        $shell->shouldNotReceive('writeStdout');
+        $shell->shouldNotReceive("writeStdout");
 
-        $this->assertFalse(class_exists('Qux'));
+        $this->assertFalse(class_exists("Qux"));
     }
 
     public function testVendorClassesAreExcluded()
     {
         $this->loader = ClassAliasAutoloader::register(
             $shell = Mockery::mock(Shell::class),
-            $this->classmapPath
+            $this->classmapPath,
         );
 
-        $shell->shouldNotReceive('writeStdout');
+        $shell->shouldNotReceive("writeStdout");
 
-        $this->assertFalse(class_exists('Three'));
+        $this->assertFalse(class_exists("Three"));
     }
 
     public function testVendorClassesCanBeWhitelisted()
@@ -68,14 +72,17 @@ class ClassAliasAutoloaderTest extends TestCase
         $this->loader = ClassAliasAutoloader::register(
             $shell = Mockery::mock(Shell::class),
             $this->classmapPath,
-            ['One\Two']
+            ["One\Two"],
         );
 
-        $shell->shouldReceive('writeStdout')
-            ->with("[!] Aliasing 'Three' to 'One\Two\Three' for this Tinker session.\n")
+        $shell
+            ->shouldReceive("writeStdout")
+            ->with(
+                "[!] Aliasing 'Three' to 'One\Two\Three' for this Tinker session.\n",
+            )
             ->once();
 
-        $this->assertTrue(class_exists('Three'));
-        $this->assertInstanceOf(\One\Two\Three::class, new \Three);
+        $this->assertTrue(class_exists("Three"));
+        $this->assertInstanceOf(\One\Two\Three::class, new \Three());
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Tinker;
+namespace Abstractrs\Tinker1984;
 
 use Exception;
 use Symfony\Component\VarDumper\Caster\Caster;
@@ -13,21 +13,21 @@ class TinkerCaster
      * @var array
      */
     private static $appProperties = [
-        'configurationIsCached',
-        'environment',
-        'environmentFile',
-        'isLocal',
-        'routesAreCached',
-        'runningUnitTests',
-        'version',
-        'path',
-        'basePath',
-        'configPath',
-        'databasePath',
-        'langPath',
-        'publicPath',
-        'storagePath',
-        'bootstrapPath',
+        "configurationIsCached",
+        "environment",
+        "environmentFile",
+        "isLocal",
+        "routesAreCached",
+        "runningUnitTests",
+        "version",
+        "path",
+        "basePath",
+        "configPath",
+        "databasePath",
+        "langPath",
+        "publicPath",
+        "storagePath",
+        "bootstrapPath",
     ];
 
     /**
@@ -44,8 +44,8 @@ class TinkerCaster
             try {
                 $val = $app->$property();
 
-                if (! is_null($val)) {
-                    $results[Caster::PREFIX_VIRTUAL.$property] = $val;
+                if (!is_null($val)) {
+                    $results[Caster::PREFIX_VIRTUAL . $property] = $val;
                 }
             } catch (Exception $e) {
                 //
@@ -64,7 +64,7 @@ class TinkerCaster
     public static function castCollection($collection)
     {
         return [
-            Caster::PREFIX_VIRTUAL.'all' => $collection->all(),
+            Caster::PREFIX_VIRTUAL . "all" => $collection->all(),
         ];
     }
 
@@ -77,7 +77,7 @@ class TinkerCaster
     public static function castHtmlString($htmlString)
     {
         return [
-            Caster::PREFIX_VIRTUAL.'html' => $htmlString->toHtml(),
+            Caster::PREFIX_VIRTUAL . "html" => $htmlString->toHtml(),
         ];
     }
 
@@ -90,7 +90,7 @@ class TinkerCaster
     public static function castStringable($stringable)
     {
         return [
-            Caster::PREFIX_VIRTUAL.'value' => (string) $stringable,
+            Caster::PREFIX_VIRTUAL . "value" => (string) $stringable,
         ];
     }
 
@@ -103,10 +103,10 @@ class TinkerCaster
     public static function castProcessResult($result)
     {
         return [
-            Caster::PREFIX_VIRTUAL.'output' => $result->output(),
-            Caster::PREFIX_VIRTUAL.'errorOutput' => $result->errorOutput(),
-            Caster::PREFIX_VIRTUAL.'exitCode' => $result->exitCode(),
-            Caster::PREFIX_VIRTUAL.'successful' => $result->successful(),
+            Caster::PREFIX_VIRTUAL . "output" => $result->output(),
+            Caster::PREFIX_VIRTUAL . "errorOutput" => $result->errorOutput(),
+            Caster::PREFIX_VIRTUAL . "exitCode" => $result->exitCode(),
+            Caster::PREFIX_VIRTUAL . "successful" => $result->successful(),
         ];
     }
 
@@ -119,11 +119,13 @@ class TinkerCaster
     public static function castModel($model)
     {
         $attributes = array_merge(
-            $model->getAttributes(), $model->getRelations()
+            $model->getAttributes(),
+            $model->getRelations(),
         );
 
         $visible = array_flip(
-            $model->getVisible() ?: array_diff(array_keys($attributes), $model->getHidden())
+            $model->getVisible() ?:
+            array_diff(array_keys($attributes), $model->getHidden()),
         );
 
         $hidden = array_flip($model->getHidden());
@@ -139,7 +141,7 @@ class TinkerCaster
         $results = [];
 
         foreach ($attributes as $key => $value) {
-            $prefix = '';
+            $prefix = "";
 
             if (isset($visible[$key])) {
                 $prefix = Caster::PREFIX_VIRTUAL;
@@ -149,7 +151,7 @@ class TinkerCaster
                 $prefix = Caster::PREFIX_PROTECTED;
             }
 
-            $results[$prefix.$key] = $value;
+            $results[$prefix . $key] = $value;
         }
 
         return $results;

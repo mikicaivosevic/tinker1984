@@ -1,19 +1,19 @@
 <?php
 
-namespace Laravel\Tinker\Tests;
+namespace Abstractrs\Tinker1984\Tests;
 
 use Illuminate\Support\Collection;
-use Laravel\Tinker\TinkerCaster;
+use Abstractrs\Tinker1984\TinkerCaster;
 use PHPUnit\Framework\TestCase;
 
 class TinkerCasterTest extends TestCase
 {
     public function testCanCastCollection()
     {
-        $caster = new TinkerCaster;
+        $caster = new TinkerCaster();
 
-        $result = $caster->castCollection(new Collection(['foo', 'bar']));
+        $result = $caster->castCollection(new Collection(["foo", "bar"]));
 
-        $this->assertSame([['foo', 'bar']], array_values($result));
+        $this->assertSame([["foo", "bar"]], array_values($result));
     }
 }

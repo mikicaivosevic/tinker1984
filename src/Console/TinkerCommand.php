@@ -1,16 +1,18 @@
 <?php
 
-namespace Laravel\Tinker\Console;
+namespace Abstractrs\Tinker1984\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Env;
-use Illuminate\Support\Facades\Log;
 use Laravel\Tinker\ClassAliasAutoloader;
+use Laravel\Tinker\Models\Tinker1984Command;
 use Psy\Configuration;
 use Psy\Shell;
 use Psy\VersionUpdater\Checker;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Laravel\Tinker\Models\Tinker1984Session;
+use Laravel\Tinker\Models\Tinker1984User;
 
 class TinkerCommand extends Command
 {
@@ -20,7 +22,14 @@ class TinkerCommand extends Command
      * @var array
      */
     protected $commandWhitelist = [
-        'clear-compiled', 'down', 'env', 'inspire', 'migrate', 'migrate:install', 'optimize', 'up',
+        "clear-compiled",
+        "down",
+        "env",
+        "inspire",
+        "migrate",
+        "migrate:install",
+        "optimize",
+        "up",
     ];
 
     /**
@@ -28,14 +37,14 @@ class TinkerCommand extends Command
      *
      * @var string
      */
-    protected $name = 'tinker';
+    protected $name = "tinker";
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Interact with your application';
+    protected $description = "Interact with your application";
 
     /**
      * Execute the console command.
@@ -44,36 +53,56 @@ class TinkerCommand extends Command
      */
     public function handle()
     {
+        $this->info("Welcome to the Tinker1984 console!");
+
+        $username = $this->ask("What is your username ?");
+        $reason = $this->ask("What is your reason for using Tinker1984 ?");
+
+        $tinkerUser = Tinker1984User::firstOrCreate(["username" => $username]);
+        $tinkerSession = Tinker1984Session::create([
+            "tinker1984_user_id" => $tinkerUser->id,
+            "reason" => $reason,
+        ]);
+
         $this->getApplication()->setCatchExceptions(false);
 
         $config = Configuration::fromInput($this->input);
         $config->setUpdateCheck(Checker::NEVER);
 
-        $config->setLogging(Log::getLogger());
+        $config->setLogging(function ($kind, $data) use ($tinkerSession) {
+            Tinker1984Command::create([
+                "tinker1984_session_id" => $tinkerSession->id,
+                "statements" => "[$kind] $data",
+            ]);
+        });
 
-        $config->getPresenter()->addCasters(
-            $this->getCasters()
-        );
+        $config->getPresenter()->addCasters($this->getCasters());
 
-        if ($this->option('execute')) {
+        if ($this->option("execute")) {
             $config->setRawOutput(true);
         }
 
         $shell = new Shell($config);
         $shell->addCommands($this->getCommands());
-        $shell->setIncludes($this->argument('include'));
+        $shell->setIncludes($this->argument("include"));
 
-        $path = Env::get('COMPOSER_VENDOR_DIR', $this->getLaravel()->basePath().DIRECTORY_SEPARATOR.'vendor');
-
-        $path .= '/composer/autoload_classmap.php';
-
-        $config = $this->getLaravel()->make('config');
-
-        $loader = ClassAliasAutoloader::register(
-            $shell, $path, $config->get('tinker.alias', []), $config->get('tinker.dont_alias', [])
+        $path = Env::get(
+            "COMPOSER_VENDOR_DIR",
+            $this->getLaravel()->basePath() . DIRECTORY_SEPARATOR . "vendor",
         );
 
-        if ($code = $this->option('execute')) {
+        $path .= "/composer/autoload_classmap.php";
+
+        $config = $this->getLaravel()->make("config");
+
+        $loader = ClassAliasAutoloader::register(
+            $shell,
+            $path,
+            $config->get("tinker.alias", []),
+            $config->get("tinker.dont_alias", []),
+        );
+
+        if ($code = $this->option("execute")) {
             try {
                 $shell->setOutput($this->output);
                 $shell->execute($code);
@@ -106,11 +135,11 @@ class TinkerCommand extends Command
             }
         }
 
-        $config = $this->getLaravel()->make('config');
+        $config = $this->getLaravel()->make("config");
 
-        foreach ($config->get('tinker.commands', []) as $command) {
+        foreach ($config->get("tinker.commands", []) as $command) {
             $commands[] = $this->getApplication()->add(
-                $this->getLaravel()->make($command)
+                $this->getLaravel()->make($command),
             );
         }
 
@@ -125,26 +154,35 @@ class TinkerCommand extends Command
     protected function getCasters()
     {
         $casters = [
-            'Illuminate\Support\Collection' => 'Laravel\Tinker\TinkerCaster::castCollection',
-            'Illuminate\Support\HtmlString' => 'Laravel\Tinker\TinkerCaster::castHtmlString',
-            'Illuminate\Support\Stringable' => 'Laravel\Tinker\TinkerCaster::castStringable',
+            "Illuminate\Support\Collection" =>
+                "Laravel\Tinker\TinkerCaster::castCollection",
+            "Illuminate\Support\HtmlString" =>
+                "Laravel\Tinker\TinkerCaster::castHtmlString",
+            "Illuminate\Support\Stringable" =>
+                "Laravel\Tinker\TinkerCaster::castStringable",
         ];
 
-        if (class_exists('Illuminate\Database\Eloquent\Model')) {
-            $casters['Illuminate\Database\Eloquent\Model'] = 'Laravel\Tinker\TinkerCaster::castModel';
+        if (class_exists("Illuminate\Database\Eloquent\Model")) {
+            $casters["Illuminate\Database\Eloquent\Model"] =
+                "Laravel\Tinker\TinkerCaster::castModel";
         }
 
-        if (class_exists('Illuminate\Process\ProcessResult')) {
-            $casters['Illuminate\Process\ProcessResult'] = 'Laravel\Tinker\TinkerCaster::castProcessResult';
+        if (class_exists("Illuminate\Process\ProcessResult")) {
+            $casters["Illuminate\Process\ProcessResult"] =
+                "Laravel\Tinker\TinkerCaster::castProcessResult";
         }
 
-        if (class_exists('Illuminate\Foundation\Application')) {
-            $casters['Illuminate\Foundation\Application'] = 'Laravel\Tinker\TinkerCaster::castApplication';
+        if (class_exists("Illuminate\Foundation\Application")) {
+            $casters["Illuminate\Foundation\Application"] =
+                "Laravel\Tinker\TinkerCaster::castApplication";
         }
 
-        $config = $this->getLaravel()->make('config');
+        $config = $this->getLaravel()->make("config");
 
-        return array_merge($casters, (array) $config->get('tinker.casters', []));
+        return array_merge(
+            $casters,
+            (array) $config->get("tinker.casters", []),
+        );
     }
 
     /**
@@ -155,7 +193,11 @@ class TinkerCommand extends Command
     protected function getArguments()
     {
         return [
-            ['include', InputArgument::IS_ARRAY, 'Include file(s) before starting tinker'],
+            [
+                "include",
+                InputArgument::IS_ARRAY,
+                "Include file(s) before starting tinker",
+            ],
         ];
     }
 
@@ -167,7 +209,12 @@ class TinkerCommand extends Command
     protected function getOptions()
     {
         return [
-            ['execute', null, InputOption::VALUE_OPTIONAL, 'Execute the given code using Tinker'],
+            [
+                "execute",
+                null,
+                InputOption::VALUE_OPTIONAL,
+                "Execute the given code using Tinker",
+            ],
         ];
     }
 }

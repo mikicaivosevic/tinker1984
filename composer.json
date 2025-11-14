@@ -1,12 +1,21 @@
 {
-    "name": "laravel/tinker",
-    "description": "Powerful REPL for the Laravel framework.",
-    "keywords": ["tinker", "repl", "psysh", "laravel"],
+    "name": "mikicaivosevic/tinker1984",
+    "description": "Auditable REPL for the Laravel framework.",
+    "keywords": [
+        "tinker",
+        "repl",
+        "psysh",
+        "laravel"
+    ],
     "license": "MIT",
     "authors": [
         {
             "name": "Taylor Otwell",
             "email": "taylor@laravel.com"
+        },
+        {
+            "name": "Mikica Ivosevic",
+            "email": "mikica@abstract.rs"
         }
     ],
     "require": {
@@ -27,12 +36,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Laravel\\Tinker\\": "src/"
+            "Abstractrs\\Tinker1984\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Laravel\\Tinker\\Tests\\": "tests/",
+            "Abstractrs\\Tinker1984\\Tests\\": "tests/",
             "App\\": "tests/fixtures/app",
             "One\\Two\\": "tests/fixtures/vendor/one/two"
         }
@@ -40,7 +49,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Laravel\\Tinker\\TinkerServiceProvider"
+                "Abstractrs\\Tinker1984\\TinkerServiceProvider"
             ]
         }
     },

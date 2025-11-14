@@ -1,14 +1,15 @@
 <?php
 
-namespace Laravel\Tinker;
+namespace Abstractrs\Tinker1984;
 
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Foundation\Application as LaravelApplication;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Lumen\Application as LumenApplication;
-use Laravel\Tinker\Console\TinkerCommand;
+use Abstractrs\Tinker1984\Console\TinkerCommand;
 
-class TinkerServiceProvider extends ServiceProvider implements DeferrableProvider
+class TinkerServiceProvider extends ServiceProvider implements
+    DeferrableProvider
 {
     /**
      * Boot the service provider.
@@ -17,15 +18,20 @@ class TinkerServiceProvider extends ServiceProvider implements DeferrableProvide
      */
     public function boot()
     {
-        $source = realpath($raw = __DIR__.'/../config/tinker.php') ?: $raw;
+        $source = realpath($raw = __DIR__ . "/../config/tinker.php") ?: $raw;
 
-        if ($this->app instanceof LaravelApplication && $this->app->runningInConsole()) {
-            $this->publishes([$source => $this->app->configPath('tinker.php')]);
+        if (
+            $this->app instanceof LaravelApplication &&
+            $this->app->runningInConsole()
+        ) {
+            $this->publishes([$source => $this->app->configPath("tinker.php")]);
         } elseif ($this->app instanceof LumenApplication) {
-            $this->app->configure('tinker');
+            $this->app->configure("tinker");
         }
 
-        $this->mergeConfigFrom($source, 'tinker');
+        $this->loadMigrationsFrom(__DIR__ . "/../database/migrations");
+
+        $this->mergeConfigFrom($source, "tinker");
     }
 
     /**
@@ -35,11 +41,11 @@ class TinkerServiceProvider extends ServiceProvider implements DeferrableProvide
      */
     public function register()
     {
-        $this->app->singleton('command.tinker', function () {
-            return new TinkerCommand;
+        $this->app->singleton("command.tinker", function () {
+            return new TinkerCommand();
         });
 
-        $this->commands(['command.tinker']);
+        $this->commands(["command.tinker"]);
     }
 
     /**
@@ -49,6 +55,6 @@ class TinkerServiceProvider extends ServiceProvider implements DeferrableProvide
      */
     public function provides()
     {
-        return ['command.tinker'];
+        return ["command.tinker"];
     }
 }

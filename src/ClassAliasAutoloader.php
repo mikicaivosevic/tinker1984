@@ -1,6 +1,6 @@
 <?php
 
-namespace Laravel\Tinker;
+namespace Abstractrs\Tinker1984;
 
 use Illuminate\Support\Str;
 use Psy\Shell;
@@ -51,11 +51,23 @@ class ClassAliasAutoloader
      * @param  array  $excludedAliases
      * @return static
      */
-    public static function register(Shell $shell, $classMapPath, array $includedAliases = [], array $excludedAliases = [])
-    {
-        return tap(new static($shell, $classMapPath, $includedAliases, $excludedAliases), function ($loader) {
-            spl_autoload_register([$loader, 'aliasClass']);
-        });
+    public static function register(
+        Shell $shell,
+        $classMapPath,
+        array $includedAliases = [],
+        array $excludedAliases = [],
+    ) {
+        return tap(
+            new static(
+                $shell,
+                $classMapPath,
+                $includedAliases,
+                $excludedAliases,
+            ),
+            function ($loader) {
+                spl_autoload_register([$loader, "aliasClass"]);
+            },
+        );
     }
 
     /**
@@ -67,8 +79,12 @@ class ClassAliasAutoloader
      * @param  array  $excludedAliases
      * @return void
      */
-    public function __construct(Shell $shell, $classMapPath, array $includedAliases = [], array $excludedAliases = [])
-    {
+    public function __construct(
+        Shell $shell,
+        $classMapPath,
+        array $includedAliases = [],
+        array $excludedAliases = [],
+    ) {
         $this->shell = $shell;
         $this->vendorPath = dirname(dirname($classMapPath));
         $this->includedAliases = collect($includedAliases);
@@ -77,13 +93,13 @@ class ClassAliasAutoloader
         $classes = require $classMapPath;
 
         foreach ($classes as $class => $path) {
-            if (! $this->isAliasable($class, $path)) {
+            if (!$this->isAliasable($class, $path)) {
                 continue;
             }
 
             $name = class_basename($class);
 
-            if (! isset($this->classes[$name])) {
+            if (!isset($this->classes[$name])) {
                 $this->classes[$name] = $class;
             }
         }
@@ -97,14 +113,16 @@ class ClassAliasAutoloader
      */
     public function aliasClass($class)
     {
-        if (Str::contains($class, '\\')) {
+        if (Str::contains($class, "\\")) {
             return;
         }
 
         $fullName = $this->classes[$class] ?? false;
 
         if ($fullName) {
-            $this->shell->writeStdout("[!] Aliasing '{$class}' to '{$fullName}' for this Tinker session.\n");
+            $this->shell->writeStdout(
+                "[!] Aliasing '{$class}' to '{$fullName}' for this Tinker session.\n",
+            );
 
             class_alias($fullName, $class);
         }
@@ -117,7 +135,7 @@ class ClassAliasAutoloader
      */
     public function unregister()
     {
-        spl_autoload_unregister([$this, 'aliasClass']);
+        spl_autoload_unregister([$this, "aliasClass"]);
     }
 
     /**
@@ -138,13 +156,17 @@ class ClassAliasAutoloader
      */
     public function isAliasable($class, $path)
     {
-        if (! Str::contains($class, '\\')) {
+        if (!Str::contains($class, "\\")) {
             return false;
         }
 
-        if (! $this->includedAliases->filter(function ($alias) use ($class) {
-            return Str::startsWith($class, $alias);
-        })->isEmpty()) {
+        if (
+            !$this->includedAliases
+                ->filter(function ($alias) use ($class) {
+                    return Str::startsWith($class, $alias);
+                })
+                ->isEmpty()
+        ) {
             return true;
         }
 
@@ -152,9 +174,13 @@ class ClassAliasAutoloader
             return false;
         }
 
-        if (! $this->excludedAliases->filter(function ($alias) use ($class) {
-            return Str::startsWith($class, $alias);
-        })->isEmpty()) {
+        if (
+            !$this->excludedAliases
+                ->filter(function ($alias) use ($class) {
+                    return Str::startsWith($class, $alias);
+                })
+                ->isEmpty()
+        ) {
             return false;
         }
 
