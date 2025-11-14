@@ -19,7 +19,7 @@ class Tinker1984Session extends Model
         return $this->tinker1984Commands();
     }
 
-    public function tinker1984Usr()
+    public function tinker1984User()
     {
         return $this->belongsTo(Tinker1984User::class);
     }
